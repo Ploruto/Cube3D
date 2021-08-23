@@ -91,11 +91,127 @@ public class Cube {
         return (1 / (Math.pow(3, level)));
     }
 
+    private static short findIndexBits(boolean valueToFind, boolean bits[]) {
+        for (short i = 0; i < bits.length; i++)
+            if (bits[i] == valueToFind)
+                return i;
+
+        return -1;
+    }
+
+    private static short[] findAllIndeciesBits(boolean valueToFind, boolean bits[]) {
+        short result[] = { 0, 0, 0, 0 };
+        short pointer = 0;
+        for (short i = 0; i < bits.length; i++)
+            if (bits[i] == valueToFind) {
+                result[pointer] = i;
+                pointer++;
+            }
+
+        return result;
+    }
+
+    private static Vector3 coordinatesOfBitsIndex(short index) {
+        /* only the first and second values are important */
+        switch (index) {
+            case 0:
+                return new Vector3(0, 0, 0);
+            case 1:
+                return new Vector3(1, 0, 0);
+            case 2:
+                return new Vector3(0, 1, 0);
+            case 3:
+                return new Vector3(1, 1, 0);
+            default:
+                return new Vector3(0, 0, 0);
+        }
+    }
+
+    public static Vector3[][] getPlanePointsFromTile(short bitsNumber) {
+        /* create bits from Number */
+        Vector3 resultPoints[][] = new Vector3[2][3];
+        boolean bits[] = new boolean[4];
+        if (bitsNumber > 7) {
+            bits[3] = true;
+            bitsNumber -= 8;
+        }
+        if (bitsNumber > 3) {
+            bits[2] = true;
+            bitsNumber -= 4;
+        }
+        if (bitsNumber > 1) {
+            bits[1] = true;
+            bitsNumber -= 2;
+        }
+        if (bitsNumber > 0) {
+            bits[0] = true;
+
+        }
+        short count = countBits(bits);
+        /* fill points -> 0,0,0 (default) */
+        for (short i = 0; i < 3; i++)
+            resultPoints[0][i] = new Vector3(i, i, 0);
+
+        switch (count) {
+            case 1: {
+                resultPoints[0][0] = coordinatesOfBitsIndex(findIndexBits(true, bits));
+                resultPoints[0][0].z = 1;
+
+                resultPoints[0][1].x = Math.abs(resultPoints[0][0].x - 1);
+                resultPoints[0][1].y = resultPoints[0][0].y;
+                resultPoints[0][1].z = 0;
+
+                resultPoints[0][2].x = resultPoints[0][0].x;
+                resultPoints[0][2].y = Math.abs(resultPoints[0][0].y - 1);
+                resultPoints[0][2].z = 0;
+                break;
+            }
+            case 2: {
+                // get all positive indecies
+                short indecies[] = findAllIndeciesBits(true, bits);
+
+                for (short i = 0; i < 2; i++) {
+                    resultPoints[0][i] = coordinatesOfBitsIndex(indecies[i]);
+                    resultPoints[0][i].z = 1;
+                    System.out.println(resultPoints[0][i].x);
+                }
+                resultPoints[0][2] = new Vector3(resultPoints[0][0].x, resultPoints[0][1].y, 0);
+                if ((bits[0] && bits[1]) || (bits[1] && bits[3]) || (bits[2] && bits[3]) || (bits[0] && bits[2]))
+                    resultPoints[0][2] = new Vector3((resultPoints[0][0].x + 1) % 2, (resultPoints[0][1].y + 1) % 2, 0);
+                break;
+            }
+            // two planes
+            case 3: {
+                short indecies[] = findAllIndeciesBits(true, bits);
+                for (short i = 0; i < 3; i++) {
+                    resultPoints[0][i] = coordinatesOfBitsIndex(indecies[i]);
+                    resultPoints[0][i].z = 1;
+                }
+
+                // create second plane's points
+            }
+        }
+
+        /* if vector [] length = 1 -> there is only one Plane to calcualte */
+        return resultPoints;
+
+    }
+
+    private static short countBits(boolean bits[]) {
+        short count = 0;
+        for (boolean bit : bits) {
+            if (bit)
+                count++;
+        }
+        return count;
+    }
+
     public static void main(String args[]) {
-        Cube cube = new Cube();
-        cube.fillInnerCubes();
-        System.out.println(Cube.getDelta(new Vector3(0, 0, 0), new Vector3(1, 1, 1), new Vector3(0, 1, 1),
-                new Vector3(0.2, 0.2, 0.2)));
+        for (Vector3 arr[] : getPlanePointsFromTile((short) 7)) {
+            for (Vector3 point : arr) {
+                System.out.println(point.x + ", " + point.y + ", " + point.z);
+            }
+        }
     }
 
 }
