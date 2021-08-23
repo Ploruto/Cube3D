@@ -66,12 +66,29 @@ public class Cube {
         }
     }
 
-    private boolean isBeingSplit(short x, short y, short z, short level) {
-        return true;
+    private boolean getCornerOffsets(short level) {
+        Vector3[] corners = new Vector3[8];
+        double stepSize = getMinimalStepOnLevel(level);
+        int i = 0;
+        for (short x = 0; x <= 1; x++) {
+            for (short y = 0; y <= 1; y++) {
+                for (short z = 0; z <= 1; z++) {
+                    // / 3 * level
+                    corners[i] = new Vector3(x * stepSize, y * stepSize, z * stepSize);
+                    i++;
+                }
+            }
+        }
+
+        return corners;
     }
 
     private String getLetter(short x, short y, short z) {
         return ";";
+    }
+
+    private static double getMinimalStepOnLevel(int level) {
+        return (1 / (Math.pow(3, level)));
     }
 
     public static void main(String args[]) {
