@@ -34,12 +34,15 @@ public class Cube {
          * divide it by 9 and get (1,−2,1) . The equation of the plane is thus
          * x−2y+z+k=0 . To get k, substitute any point and solve; we get k=−6. The final
          * equation of the plane is x−2y+z−6=0 .
-         * 
          */
 
+        /* calculate VectorAB & AC */
         Vector3 vecAB = new Vector3(pointB.x - pointA.x, pointB.y - pointA.y, pointB.z - pointA.z);
         Vector3 vecAC = new Vector3(pointC.x - pointA.x, pointC.y - pointA.y, pointC.z - pointA.z);
+        /* take cross product of VectorAB & VectorAC */
+
         Vector3.crossProduct(vecAB, vecAC);
+
         return 0.0;
     }
 }
