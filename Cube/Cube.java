@@ -53,7 +53,30 @@ public class Cube {
         return ((pointInCubeToCheck.x * x) + (pointInCubeToCheck.y * y) + (pointInCubeToCheck.z * z) + k);
     }
 
+    private void fillInnerCubes() {
+        this.hasChildren = true;
+        for (short x = 0; x < 3; x++) {
+            for (short y = 0; y < 3; y++) {
+                for (short z = 0; z < 3; z++) {
+                    this.innerCubes[x][y][z] = new Cube();
+                    this.innerCubes[x][y][z].level = (short) (this.level + 1);
+                    this.innerCubes[x][y][z].address = this.address + getLetter(x, y, z);
+                }
+            }
+        }
+    }
+
+    private boolean isBeingSplit(short x, short y, short z, short level) {
+        return true;
+    }
+
+    private String getLetter(short x, short y, short z) {
+        return ";";
+    }
+
     public static void main(String args[]) {
+        Cube cube = new Cube();
+        cube.fillInnerCubes();
         System.out.println(Cube.getDelta(new Vector3(0, 0, 0), new Vector3(1, 1, 1), new Vector3(0, 1, 1),
                 new Vector3(0.2, 0.2, 0.2)));
     }
