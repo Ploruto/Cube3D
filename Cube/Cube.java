@@ -25,7 +25,7 @@ public class Cube {
     private boolean hasChildren = false;
     private String address = "";
 
-    private static double getDelta(Vector3 pointA, Vector3 pointB, Vector3 pointC) {
+    private static double getDelta(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 pointInCubeToCheck) {
 
         /*
          * Get two different vectors which are in the plane, such as B−A=(3,0,−3) and
@@ -40,9 +40,22 @@ public class Cube {
         Vector3 vecAB = new Vector3(pointB.x - pointA.x, pointB.y - pointA.y, pointB.z - pointA.z);
         Vector3 vecAC = new Vector3(pointC.x - pointA.x, pointC.y - pointA.y, pointC.z - pointA.z);
         /* take cross product of VectorAB & VectorAC */
+        Vector3 cross_P = Vector3.crossProduct(vecAB, vecAC);
+        /* deconstruct x,y,z -> for x+y+z+k=0 */
+        double x = cross_P.x;
+        double y = cross_P.y;
+        double z = cross_P.z;
+        /* solve for k (use any point) */
+        double k = ((pointA.x * x) + (pointA.y * y) + (pointA.z * z)) * -1;
 
-        Vector3.crossProduct(vecAB, vecAC);
+        /* solve with x,y,z of PointToCheck */
 
-        return 0.0;
+        return ((pointInCubeToCheck.x * x) + (pointInCubeToCheck.y * y) + (pointInCubeToCheck.z * z) + k);
     }
+
+    public static void main(String args[]) {
+        System.out.println(Cube.getDelta(new Vector3(0, 0, 0), new Vector3(1, 1, 1), new Vector3(0, 1, 1),
+                new Vector3(0.2, 0.2, 0.2)));
+    }
+
 }
