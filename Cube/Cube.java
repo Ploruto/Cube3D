@@ -234,8 +234,7 @@ public class Cube {
             }
         }
         double one = 0.6;
-        // System.out.println(cube.isBeingSplit(points[0][0], points[0][1],
-        // points[0][2], one, one, one, (short) 2));
+        System.out.println(cube.isBeingSplit(points[0][0], points[0][1], points[0][2], one, one, one, (short) 2));
     }
 
 }
