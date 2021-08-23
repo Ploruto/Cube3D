@@ -66,7 +66,7 @@ public class Cube {
         }
     }
 
-    private boolean getCornerOffsets(short level) {
+    private static Vector3[] getCornerOffsets(short level) {
         Vector3[] corners = new Vector3[8];
         double stepSize = getMinimalStepOnLevel(level);
         int i = 0;
@@ -85,6 +85,25 @@ public class Cube {
 
     private String getLetter(short x, short y, short z) {
         return ";";
+    }
+
+    public boolean isBeingSplit(Vector3 pointA, Vector3 pointB, Vector3 pointC, double absoluteX, double absoluteY,
+            double absoluteZ, short level) {
+        if (level == 0)
+            return true;
+
+        Vector3 cornerOffsets[] = getCornerOffsets(level);
+        short originDeltaSignum = (short) Math
+                .signum(getDelta(pointA, pointB, pointC, new Vector3(absoluteX, absoluteY, absoluteZ)));
+
+        for (int i = 1; i < cornerOffsets.length; i++) {
+            if (Math.signum(getDelta(pointA, pointB, pointC, new Vector3(absoluteX + cornerOffsets[i].x,
+                    absoluteY + cornerOffsets[i].y, absoluteZ + cornerOffsets[i].z))) != originDeltaSignum) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static double getMinimalStepOnLevel(int level) {
@@ -207,11 +226,16 @@ public class Cube {
     }
 
     public static void main(String args[]) {
-        for (Vector3 arr[] : getPlanePointsFromTile((short) 7)) {
-            for (Vector3 point : arr) {
-                System.out.println(point.x + ", " + point.y + ", " + point.z);
+        Cube cube = new Cube();
+        Vector3 points[][] = getPlanePointsFromTile((short) 1);
+        for (Vector3[] vector3s : points) {
+            for (Vector3 vector : vector3s) {
+                System.out.println(vector.x + ", " + vector.y + ", " + vector.z);
             }
         }
+        double one = 0.6;
+        // System.out.println(cube.isBeingSplit(points[0][0], points[0][1],
+        // points[0][2], one, one, one, (short) 2));
     }
 
 }
