@@ -345,20 +345,15 @@ public class Cube {
     private void recursiveSplitting(short tileNumber, short detailDepth, double absX, double absY, double absZ,
             boolean keepPositiveDelta) {
         Vector3 planePoints[] = getPlanePointsFromTile(tileNumber);
-        for (Vector3 point : planePoints) {
-            System.out.println(point.x + ", " + point.y + ", " + point.z);
-        }
 
         for (short iterX = 0; iterX < 3; iterX++) {
             for (short iterY = 0; iterY < 3; iterY++) {
                 for (short iterZ = 0; iterZ < 3; iterZ++) {
                     if (this.innerCubes[iterX][iterY][iterZ] != null) {
                         double minStep = getMinimalStepOnLevel(this.innerCubes[iterX][iterY][iterZ].level);
-
                         if (isBeingSplit(planePoints[0], planePoints[1], planePoints[2], absX + (minStep * iterX),
                                 absY + (minStep * iterY), absZ + (minStep * iterZ),
                                 this.innerCubes[iterX][iterY][iterZ].level)) {
-                            System.out.println("isBEINGSPLIT!");
                             // end iteration is reached
                             if (detailDepth == this.innerCubes[iterX][iterY][iterZ].level) {
                                 if (keepPositiveDelta) {
