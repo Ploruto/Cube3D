@@ -17,7 +17,7 @@ class Vector3 {
         return cross_P;
     }
 
-    Vector3(Vector other) {
+    Vector3(Vector3 other) {
         this.x = other.x;
         this.y = other.y;
         this.z = other.z;
@@ -89,7 +89,7 @@ public class Cube {
         return corners;
     }
 
-    private String getLetter(short x, short y, short z) {
+    private String getLetter(short xIndex, short yIndex, short zIndex) {
         if (zIndex == 0) {
             if (yIndex == 0) {
                 switch (xIndex) {
@@ -178,6 +178,7 @@ public class Cube {
                 }
             }
         }
+        return ".";
     }
 
     public static boolean isBeingSplit(Vector3 pointA, Vector3 pointB, Vector3 pointC, double absoluteX,
@@ -397,6 +398,7 @@ public class Cube {
         System.out.println(cube.innerCubes[2][2][2]);
 
         cube.printCases(getPlanePointsFromTile((short) 8), 0.5, 0.5, 0.5);
+        System.out.println(cube.innerCubes[0][1][0].innerCubes[0][0][0].address);
 
     }
 
