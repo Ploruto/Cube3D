@@ -87,8 +87,8 @@ public class Cube {
         return ";";
     }
 
-    public boolean isBeingSplit(Vector3 pointA, Vector3 pointB, Vector3 pointC, double absoluteX, double absoluteY,
-            double absoluteZ, short level) {
+    public static boolean isBeingSplit(Vector3 pointA, Vector3 pointB, Vector3 pointC, double absoluteX,
+            double absoluteY, double absoluteZ, short level) {
         if (level == 0)
             return true;
 
@@ -134,21 +134,21 @@ public class Cube {
         /* only the first and second values are important */
         switch (index) {
             case 0:
-                return new Vector3(0, 0, 0);
-            case 1:
                 return new Vector3(1, 0, 0);
+            case 1:
+                return new Vector3(0, 0, 0);
             case 2:
-                return new Vector3(0, 1, 0);
-            case 3:
                 return new Vector3(1, 1, 0);
+            case 3:
+                return new Vector3(0, 1, 0);
             default:
                 return new Vector3(0, 0, 0);
         }
     }
 
-    public static Vector3[][] getPlanePointsFromTile(short bitsNumber) {
+    public static Vector3[] getPlanePointsFromTile(short bitsNumber) {
         /* create bits from Number */
-        Vector3 resultPoints[][] = new Vector3[2][3];
+        Vector3 resultPoints[] = new Vector3[3];
         boolean bits[] = new boolean[4];
         if (bitsNumber > 7) {
             bits[3] = true;
@@ -169,20 +169,20 @@ public class Cube {
         short count = countBits(bits);
         /* fill points -> 0,0,0 (default) */
         for (short i = 0; i < 3; i++)
-            resultPoints[0][i] = new Vector3(i, i, 0);
+            resultPoints[i] = new Vector3(i, i, 0);
 
         switch (count) {
             case 1: {
-                resultPoints[0][0] = coordinatesOfBitsIndex(findIndexBits(true, bits));
-                resultPoints[0][0].z = 1;
+                resultPoints[0] = coordinatesOfBitsIndex(findIndexBits(true, bits));
+                resultPoints[0].z = 1;
 
-                resultPoints[0][1].x = Math.abs(resultPoints[0][0].x - 1);
-                resultPoints[0][1].y = resultPoints[0][0].y;
-                resultPoints[0][1].z = 0;
+                resultPoints[1].x = Math.abs(resultPoints[0].x - 1);
+                resultPoints[1].y = resultPoints[0].y;
+                resultPoints[1].z = 0;
 
-                resultPoints[0][2].x = resultPoints[0][0].x;
-                resultPoints[0][2].y = Math.abs(resultPoints[0][0].y - 1);
-                resultPoints[0][2].z = 0;
+                resultPoints[2].x = resultPoints[0].x;
+                resultPoints[2].y = Math.abs(resultPoints[0].y - 1);
+                resultPoints[2].z = 0;
                 break;
             }
             case 2: {
@@ -190,22 +190,26 @@ public class Cube {
                 short indecies[] = findAllIndeciesBits(true, bits);
 
                 for (short i = 0; i < 2; i++) {
-                    resultPoints[0][i] = coordinatesOfBitsIndex(indecies[i]);
-                    resultPoints[0][i].z = 1;
-                    System.out.println(resultPoints[0][i].x);
+                    resultPoints[i] = coordinatesOfBitsIndex(indecies[i]);
+                    resultPoints[i].z = 1;
                 }
-                resultPoints[0][2] = new Vector3(resultPoints[0][0].x, resultPoints[0][1].y, 0);
+                resultPoints[2] = new Vector3(resultPoints[0].x, resultPoints[1].y, 0);
                 if ((bits[0] && bits[1]) || (bits[1] && bits[3]) || (bits[2] && bits[3]) || (bits[0] && bits[2]))
-                    resultPoints[0][2] = new Vector3((resultPoints[0][0].x + 1) % 2, (resultPoints[0][1].y + 1) % 2, 0);
+                    resultPoints[2] = new Vector3((resultPoints[0].x + 1) % 2, (resultPoints[1].y + 1) % 2, 0);
                 break;
             }
             // two planes
             case 3: {
-                short indecies[] = findAllIndeciesBits(true, bits);
-                for (short i = 0; i < 3; i++) {
-                    resultPoints[0][i] = coordinatesOfBitsIndex(indecies[i]);
-                    resultPoints[0][i].z = 1;
-                }
+                Vector3 negative = coordinatesOfBitsIndex(findIndexBits(false, bits));
+                resultPoints[0] = negative;
+                resultPoints[1] = negative;
+                resultPoints[1].x = ((negative.x + 1) % 2);
+                resultPoints[1].z = 1;
+                resultPoints[2] = negative;
+                resultPoints[2].y = ((negative.y + 1) % 2);
+                resultPoints[2].z = 1;
+
+                // alt- >
 
                 // create second plane's points
             }
@@ -214,6 +218,16 @@ public class Cube {
         /* if vector [] length = 1 -> there is only one Plane to calcualte */
         return resultPoints;
 
+    }
+
+    public printCases(Vector3[] points, double[] values, Cube cube)
+    {
+            System.out.println(
+                "Delta of Point( " + values[0] + ", " + values[1] + ", " + values[2] +") is: " +
+                 getDelta(points[0], points[1], points[2], new Vector3(doubles[0], doubles[1], doubles[2]))
+                + " and the cube is" +
+                + (isBeingSplit(points[0], points[1], points[2], values[0], values[1], values[2], 2) ? "" : "NOT") + "being split!");
+        
     }
 
     private static short countBits(boolean bits[]) {
@@ -225,16 +239,72 @@ public class Cube {
         return count;
     }
 
-    public static void main(String args[]) {
-        Cube cube = new Cube();
-        Vector3 points[][] = getPlanePointsFromTile((short) 1);
-        for (Vector3[] vector3s : points) {
-            for (Vector3 vector : vector3s) {
-                System.out.println(vector.x + ", " + vector.y + ", " + vector.z);
+    public void splitCube(short tileNumber, short detailDepth, boolean keepPositiveDelta) {
+        this.fillInnerCubes();
+        if (tileNumber == 6 || tileNumber == 9) {
+            // execute 2 splits
+            return;
+        }
+
+        this.recursiveSplitting(tileNumber, detailDepth, (double) 0, (double) 0, (double) 0, keepPositiveDelta);
+
+    }
+
+    private void recursiveSplitting(short tileNumber, short detailDepth, double absX, double absY, double absZ,
+            boolean keepPositiveDelta) {
+        Vector3 planePoints[] = getPlanePointsFromTile(tileNumber);
+        for (Vector3 point : planePoints) {
+            System.out.println(point.x + ", " + point.y + ", " + point.z);
+        }
+
+        for (short iterX = 0; iterX < 3; iterX++) {
+            for (short iterY = 0; iterY < 3; iterY++) {
+                for (short iterZ = 0; iterZ < 3; iterZ++) {
+                    if (this.innerCubes[iterX][iterY][iterZ] != null) {
+                        double minStep = getMinimalStepOnLevel(this.innerCubes[iterX][iterY][iterZ].level);
+
+                        if (isBeingSplit(planePoints[0], planePoints[1], planePoints[2], absX + (minStep * iterX),
+                                absY + (minStep * iterY), absZ + (minStep * iterZ),
+                                this.innerCubes[iterX][iterY][iterZ].level)) {
+                            System.out.println("isBEINGSPLIT!");
+                            // end iteration is reached
+                            if (detailDepth == this.innerCubes[iterX][iterY][iterZ].level) {
+                                if (keepPositiveDelta) {
+                                    this.innerCubes[iterX][iterY][iterZ] = null;
+                                }
+                                break;
+                            } else {
+                                this.innerCubes[iterX][iterY][iterZ].recursiveSplitting(tileNumber, detailDepth,
+                                        absX + (minStep * iterX), absY + (minStep * iterY), absZ + (minStep * iterZ),
+                                        keepPositiveDelta);
+                            }
+
+                        } // if delta is positive and keepPositive is false (negative is handled likewise)
+                          // -> set null
+                        else if ((getDelta(planePoints[0], planePoints[1], planePoints[2],
+                                new Vector3(absX + (minStep * iterX), absY + (minStep * iterY),
+                                        absZ + (minStep * iterZ))) > 0
+                                && !keepPositiveDelta)
+                                || (getDelta(planePoints[0], planePoints[1], planePoints[2],
+                                        new Vector3(absX + (minStep * iterX), absY + (minStep * iterY),
+                                                absZ + (minStep * iterZ))) < 0
+                                        && keepPositiveDelta)) {
+                            this.innerCubes[iterX][iterY][iterZ] = null;
+                        }
+
+                    }
+                }
             }
         }
-        double one = 0.6;
-        System.out.println(cube.isBeingSplit(points[0][0], points[0][1], points[0][2], one, one, one, (short) 2));
+    }
+
+    public static void main(String args[]) {
+        Cube cube = new Cube();
+        // Vector3 points[][] = getPlanePointsFromTile((short) 11);
+
+        cube.splitCube((short) 8, (short) 3, true);
+        System.out.println(cube.innerCubes[2][2][2]);
+
     }
 
 }
