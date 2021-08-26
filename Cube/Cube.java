@@ -324,6 +324,13 @@ public class Cube {
 
     }
 
+    public String toString() {
+        if (this.isFullyFilled)
+            return this.address;
+        else
+            return "-";
+    }
+
     private static short countBits(boolean bits[]) {
         short count = 0;
         for (boolean bit : bits) {
@@ -367,7 +374,6 @@ public class Cube {
             if ((delta > 0 && !keepPositiveDelta) || (delta < 0 && keepPositiveDelta)) {
                 this.hasChildren = false;
                 this.isFullyFilled = false;
-                System.out.println("end at " + this.address);
             }
         }
 
