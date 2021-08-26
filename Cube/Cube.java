@@ -29,6 +29,7 @@ public class Cube {
     private short level = 0;
     private Cube innerCubes[][][] = new Cube[SIZE][SIZE][SIZE];
     private boolean hasChildren = false;
+    private boolean isFullyFilled = true;
     private String address = "";
 
     private static double getDelta(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 pointInCubeToCheck) {
@@ -357,6 +358,7 @@ public class Cube {
                             // end iteration is reached
                             if (detailDepth == this.innerCubes[iterX][iterY][iterZ].level) {
                                 if (keepPositiveDelta) {
+                                    this.isFullyFilled = false;
                                     this.innerCubes[iterX][iterY][iterZ] = null;
                                 }
                                 break;
@@ -376,6 +378,7 @@ public class Cube {
                                         new Vector3(absX + (minStep * iterX), absY + (minStep * iterY),
                                                 absZ + (minStep * iterZ))) < 0
                                         && keepPositiveDelta)) {
+                            this.isFullyFilled = false;
                             this.innerCubes[iterX][iterY][iterZ] = null;
                         }
 
@@ -393,7 +396,7 @@ public class Cube {
         System.out.println(cube.innerCubes[2][2][2]);
 
         cube.printCases(getPlanePointsFromTile((short) 8), 0.5, 0.5, 0.5);
-        System.out.println(cube.innerCubes[0][1][0].innerCubes[0][0][0].address);
+        System.out.println(cube.innerCubes[0][1][0].innerCubes[1][1][1]);
 
     }
 
