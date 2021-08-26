@@ -90,7 +90,94 @@ public class Cube {
     }
 
     private String getLetter(short x, short y, short z) {
-        return ";";
+        if (zIndex == 0) {
+            if (yIndex == 0) {
+                switch (xIndex) {
+                    case 0:
+                        return "A";
+                    case 1:
+                        return "B";
+                    case 2:
+                        return "C";
+                }
+            } else if (yIndex == 1) {
+                switch (xIndex) {
+                    case 0:
+                        return "D";
+                    case 1:
+                        return "E";
+                    case 2:
+                        return "F";
+                }
+            } else if (yIndex == 2) {
+                switch (xIndex) {
+                    case 0:
+                        return "G";
+                    case 1:
+                        return "H";
+                    case 2:
+                        return "I";
+                }
+            }
+        } else if (zIndex == 1) {
+            if (yIndex == 0) {
+                switch (xIndex) {
+                    case 0:
+                        return "J";
+                    case 1:
+                        return "K";
+                    case 2:
+                        return "L";
+                }
+            } else if (yIndex == 1) {
+                switch (xIndex) {
+                    case 0:
+                        return "M";
+                    case 1:
+                        return "#";
+                    case 2:
+                        return "N";
+                }
+            } else if (yIndex == 2) {
+                switch (xIndex) {
+                    case 0:
+                        return "O";
+                    case 1:
+                        return "P";
+                    case 2:
+                        return "Q";
+                }
+            }
+        } else if (zIndex == 2) {
+            if (yIndex == 0) {
+                switch (xIndex) {
+                    case 0:
+                        return "R";
+                    case 1:
+                        return "S";
+                    case 2:
+                        return "T";
+                }
+            } else if (yIndex == 1) {
+                switch (xIndex) {
+                    case 0:
+                        return "U";
+                    case 1:
+                        return "V";
+                    case 2:
+                        return "W";
+                }
+            } else if (yIndex == 2) {
+                switch (xIndex) {
+                    case 0:
+                        return "X";
+                    case 1:
+                        return "Y";
+                    case 2:
+                        return "Z";
+                }
+            }
+        }
     }
 
     public static boolean isBeingSplit(Vector3 pointA, Vector3 pointB, Vector3 pointC, double absoluteX,
