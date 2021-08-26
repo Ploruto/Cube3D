@@ -29,7 +29,7 @@ public class Cube {
     private short level = 0;
     private Cube innerCubes[][][] = new Cube[SIZE][SIZE][SIZE];
     private boolean hasChildren = false;
-    private boolean isFullyFilled = true;
+    private boolean isFullyFilled = false;
     private String address = "";
 
     private static double getDelta(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 pointInCubeToCheck) {
@@ -62,6 +62,7 @@ public class Cube {
 
     private void fillInnerCubes() {
         this.hasChildren = true;
+        this.isFullyFilled = true;
         for (short x = 0; x < 3; x++) {
             for (short y = 0; y < 3; y++) {
                 for (short z = 0; z < 3; z++) {
@@ -347,74 +348,50 @@ public class Cube {
             boolean keepPositiveDelta) {
         Vector3 planePoints[] = getPlanePointsFromTile(tileNumber);
 
-        for (short iterX = 0; iterX < 3; iterX++) {
-            for (short iterY = 0; iterY < 3; iterY++) {
-                for (short iterZ = 0; iterZ < 3; iterZ++) {
-                    if (this.innerCubes[iterX][iterY][iterZ] != null) {
-                        this.innerCubes[iterX][iterY][iterZ].fillInnerCubes();
-                        double minStep = getMinimalStepOnLevel(this.innerCubes[iterX][iterY][iterZ].level);
-                        if (isBeingSplit(planePoints[0], planePoints[1], planePoints[2], absX + (minStep * iterX),
-                                absY + (minStep * iterY), absZ + (minStep * iterZ),
-                                this.innerCubes[iterX][iterY][iterZ].level)) {
-                            // end iteration is reached
-                            if (detailDepth == this.innerCubes[iterX][iterY][iterZ].level) {
-                                if (keepPositiveDelta) {
-                                    this.isFullyFilled = false;
-                                    this.innerCubes[iterX][iterY][iterZ] = null;
-                                }
-                                break;
-                            } else {
-                                this.innerCubes[iterX][iterY][iterZ].recursiveSplitting(tileNumber, detailDepth,
-                                        absX + (minStep * iterX), absY + (minStep * iterY), absZ + (minStep * iterZ),
-                                        keepPositiveDelta);
-                            }
-
-                        } // if delta is positive and keepPositive is false (negative is handled likewise)
-                          // -> set null
-                        else if ((getDelta(planePoints[0], planePoints[1], planePoints[2],
-                                new Vector3(absX + (minStep * iterX), absY + (minStep * iterY),
-                                        absZ + (minStep * iterZ))) > 0
-                                && !keepPositiveDelta)
-                                || (getDelta(planePoints[0], planePoints[1], planePoints[2],
-                                        new Vector3(absX + (minStep * iterX), absY + (minStep * iterY),
-                                                absZ + (minStep * iterZ))) < 0
-                                        && keepPositiveDelta)) {
-                            this.isFullyFilled = false;
-                            this.innerCubes[iterX][iterY][iterZ] = null;
+        if (isBeingSplit(planePoints[0], planePoints[1], planePoints[2], absX, absY, absY, this.level)) {
+            if (this.level < detailDepth) {
+                double minStep = getMinimalStepOnLevel(this.level + 1);
+                this.fillInnerCubes();
+                for (short x = 0; x < 3; x++) {
+                    for (short y = 0; y < 3; y++) {
+                        for (short z = 0; z < 3; z++) {
+                            this.innerCubes[x][y][z].recursiveSplitting(tileNumber, detailDepth, absX + (minStep * x),
+                                    absY + (minStep * y), absZ + (minStep * z), keepPositiveDelta);
                         }
-
-                        boolean tempHasChilren = true;
-                        for (short x = 0; x < 3; x++) {
-                            for (short y = 0; y < 3; y++) {
-                                for (short z = 0; z < 3; z++) {
-                                    if (this.innerCubes[iterX][iterY][iterZ] != null) {
-
-                                        if (this.innerCubes[iterX][iterY][iterZ].innerCubes[x][y][z] == null) {
-                                            tempHasChilren = false;
-                                        }
-                                        this.innerCubes[iterX][iterY][iterZ].hasChildren = tempHasChilren;
-
-                                    }
-
-                                }
-                            }
-                        }
-
                     }
                 }
             }
+
+        } else {
+            double delta = getDelta(planePoints[0], planePoints[1], planePoints[2], new Vector3(absX, absY, absZ));
+            if ((delta > 0 && !keepPositiveDelta) || (delta < 0 && keepPositiveDelta)) {
+                this.hasChildren = false;
+                this.isFullyFilled = false;
+                System.out.println("end at " + this.address);
+            }
         }
+
     }
 
     public static void main(String args[]) {
         Cube cube = new Cube();
         // Vector3 points[][] = getPlanePointsFromTile((short) 11);
 
-        cube.splitCube((short) 8, (short) 3, true);
+        cube.splitCube((short) 8, (short) 4, true);
         // System.out.println(cube.innerCubes[2][2][2]);
 
         // cube.printCases(getPlanePointsFromTile((short) 8), 0.5, 0.5, 0.5);
-        System.out.println(cube.hasChildren);
+        System.out.println(cube.innerCubes[1][1][2].hasChildren);
+        System.out.println(cube.innerCubes[1][1][2].isFullyFilled);
+        for (short iterX = 0; iterX < 3; iterX++) {
+            for (short iterY = 0; iterY < 3; iterY++) {
+                for (short iterZ = 0; iterZ < 3; iterZ++) {
+                    if (cube.innerCubes[1][2][2].hasChildren) {
+                        System.out.println(cube.innerCubes[1][2][2].innerCubes[iterX][iterY][iterZ]);
+                    }
+                }
+            }
+        }
     }
 
 }
