@@ -16,6 +16,12 @@ class Vector3 {
         cross_P.z = vect_A.x * vect_B.y - vect_A.y * vect_B.x;
         return cross_P;
     }
+
+    Vector3(Vector other) {
+        this.x = other.x;
+        this.y = other.y;
+        this.z = other.z;
+    }
 }
 
 public class Cube {
@@ -200,13 +206,13 @@ public class Cube {
             }
             // two planes
             case 3: {
-                Vector3 negative = coordinatesOfBitsIndex(findIndexBits(false, bits));
-                resultPoints[0] = negative;
-                resultPoints[1] = negative;
-                resultPoints[1].x = ((negative.x + 1) % 2);
+                Vector3 nonPositiveBitPosition = coordinatesOfBitsIndex(findIndexBits(false, bits));
+                resultPoints[0] = new Vector3(nonPositiveBitPosition);
+                resultPoints[1] = new Vector3(nonPositiveBitPosition);
+                resultPoints[1].x = ((nonPositiveBitPosition.x + 1) % 2);
                 resultPoints[1].z = 1;
-                resultPoints[2] = negative;
-                resultPoints[2].y = ((negative.y + 1) % 2);
+                resultPoints[2] = new Vector3(nonPositiveBitPosition);
+                resultPoints[2].y = ((nonPositiveBitPosition.y + 1) % 2);
                 resultPoints[2].z = 1;
 
                 // alt- >
