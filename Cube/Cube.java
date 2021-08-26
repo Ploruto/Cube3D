@@ -351,6 +351,7 @@ public class Cube {
             for (short iterY = 0; iterY < 3; iterY++) {
                 for (short iterZ = 0; iterZ < 3; iterZ++) {
                     if (this.innerCubes[iterX][iterY][iterZ] != null) {
+                        this.innerCubes[iterX][iterY][iterZ].fillInnerCubes();
                         double minStep = getMinimalStepOnLevel(this.innerCubes[iterX][iterY][iterZ].level);
                         if (isBeingSplit(planePoints[0], planePoints[1], planePoints[2], absX + (minStep * iterX),
                                 absY + (minStep * iterY), absZ + (minStep * iterZ),
@@ -382,6 +383,23 @@ public class Cube {
                             this.innerCubes[iterX][iterY][iterZ] = null;
                         }
 
+                        boolean tempHasChilren = true;
+                        for (short x = 0; x < 3; x++) {
+                            for (short y = 0; y < 3; y++) {
+                                for (short z = 0; z < 3; z++) {
+                                    if (this.innerCubes[iterX][iterY][iterZ] != null) {
+
+                                        if (this.innerCubes[iterX][iterY][iterZ].innerCubes[x][y][z] == null) {
+                                            tempHasChilren = false;
+                                        }
+                                        this.innerCubes[iterX][iterY][iterZ].hasChildren = tempHasChilren;
+
+                                    }
+
+                                }
+                            }
+                        }
+
                     }
                 }
             }
@@ -393,11 +411,10 @@ public class Cube {
         // Vector3 points[][] = getPlanePointsFromTile((short) 11);
 
         cube.splitCube((short) 8, (short) 3, true);
-        System.out.println(cube.innerCubes[2][2][2]);
+        // System.out.println(cube.innerCubes[2][2][2]);
 
-        cube.printCases(getPlanePointsFromTile((short) 8), 0.5, 0.5, 0.5);
-        System.out.println(cube.innerCubes[0][1][0].innerCubes[1][1][1]);
-
+        // cube.printCases(getPlanePointsFromTile((short) 8), 0.5, 0.5, 0.5);
+        System.out.println(cube.hasChildren);
     }
 
 }
