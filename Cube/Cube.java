@@ -220,14 +220,12 @@ public class Cube {
 
     }
 
-    public printCases(Vector3[] points, double[] values, Cube cube)
-    {
-            System.out.println(
-                "Delta of Point( " + values[0] + ", " + values[1] + ", " + values[2] +") is: " +
-                 getDelta(points[0], points[1], points[2], new Vector3(doubles[0], doubles[1], doubles[2]))
-                + " and the cube is" +
-                + (isBeingSplit(points[0], points[1], points[2], values[0], values[1], values[2], 2) ? "" : "NOT") + "being split!");
-        
+    public void printCases(Vector3[] points, double x, double y, double z) {
+        System.out.println("Delta of Point(" + x + ", " + y + ", " + z + ") is: "
+                + getDelta(points[0], points[1], points[2], new Vector3(x, y, z)) + " and the cube is"
+                + (isBeingSplit(points[0], points[1], points[2], x, y, z, (short) 2) ? "" : " NOT ")
+                + "being split! (at level 2)");
+
     }
 
     private static short countBits(boolean bits[]) {
@@ -304,6 +302,8 @@ public class Cube {
 
         cube.splitCube((short) 8, (short) 3, true);
         System.out.println(cube.innerCubes[2][2][2]);
+
+        cube.printCases(getPlanePointsFromTile((short) 8), 0.5, 0.5, 0.5);
 
     }
 
