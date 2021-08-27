@@ -30,6 +30,7 @@ public class Cube {
     private Cube innerCubes[][][] = new Cube[SIZE][SIZE][SIZE];
     private boolean hasChildren = false;
     private boolean isFullyFilled = false;
+    private boolean isValid = true;
     private String address = "";
 
     private static double getDelta(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 pointInCubeToCheck) {
@@ -355,7 +356,7 @@ public class Cube {
             boolean keepPositiveDelta) {
         Vector3 planePoints[] = getPlanePointsFromTile(tileNumber);
 
-        if (isBeingSplit(planePoints[0], planePoints[1], planePoints[2], absX, absY, absY, this.level)) {
+        if (isBeingSplit(planePoints[0], planePoints[1], planePoints[2], absX, absY, absZ, this.level)) {
             if (this.level < detailDepth) {
                 double minStep = getMinimalStepOnLevel(this.level + 1);
                 this.fillInnerCubes();
@@ -374,7 +375,22 @@ public class Cube {
             if ((delta > 0 && !keepPositiveDelta) || (delta < 0 && keepPositiveDelta)) {
                 this.hasChildren = false;
                 this.isFullyFilled = false;
+                this.isValid = false;
             }
+        }
+        if (this.hasChildren) {
+
+            boolean temp = true;
+            for (short iterX = 0; iterX < 3; iterX++) {
+                for (short iterY = 0; iterY < 3; iterY++) {
+                    for (short iterZ = 0; iterZ < 3; iterZ++) {
+                        if (!this.innerCubes[iterX][iterY][iterZ].isValid) {
+                            temp = false;
+                        }
+                    }
+                }
+            }
+            this.isFullyFilled = temp;
         }
 
     }
@@ -384,16 +400,20 @@ public class Cube {
         // Vector3 points[][] = getPlanePointsFromTile((short) 11);
 
         cube.splitCube((short) 8, (short) 4, true);
-        // System.out.println(cube.innerCubes[2][2][2]);
 
         // cube.printCases(getPlanePointsFromTile((short) 8), 0.5, 0.5, 0.5);
-        System.out.println(cube.innerCubes[1][1][2].hasChildren);
-        System.out.println(cube.innerCubes[1][1][2].isFullyFilled);
+
+        Cube lookAtCube = cube.innerCubes[0][2][2];
+        // Cube lookAtCube = cube.innerCubes[1][2][0];
+        // Cube lookAtCube = cube.innerCubes[0][0][0];
+        System.out.println(lookAtCube.hasChildren);
+        System.out.println(lookAtCube.isFullyFilled);
         for (short iterX = 0; iterX < 3; iterX++) {
             for (short iterY = 0; iterY < 3; iterY++) {
                 for (short iterZ = 0; iterZ < 3; iterZ++) {
-                    if (cube.innerCubes[1][2][2].hasChildren) {
-                        System.out.println(cube.innerCubes[1][2][2].innerCubes[iterX][iterY][iterZ]);
+                    if (lookAtCube.hasChildren) {
+                        System.out.println(lookAtCube.innerCubes[iterX][iterY][iterZ].address + " "
+                                + lookAtCube.innerCubes[iterX][iterY][iterZ].isValid);
                     }
                 }
             }
