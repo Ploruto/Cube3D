@@ -1,5 +1,7 @@
 package Cube;
 
+import java.util.ArrayList;
+
 class Vector3 {
     double x, y, z = 0;
 
@@ -395,11 +397,41 @@ public class Cube {
 
     }
 
+    public ArrayList<String> getEndAddresses() {
+        ArrayList<String> addresses = new ArrayList<String>();
+
+        recursiveAddressStep(this, addresses);
+
+        return addresses;
+    }
+
+    private static ArrayList<String> recursiveAddressStep(Cube cube, ArrayList<String> addresses) {
+        for (short iterX = 0; iterX < 3; iterX++) {
+            for (short iterY = 0; iterY < 3; iterY++) {
+                for (short iterZ = 0; iterZ < 3; iterZ++) {
+                    if (cube.hasChildren) {
+                        if (cube.isFullyFilled) {
+                            addresses.add(cube.address);
+                            return addresses;
+                        }
+                        if (!cube.innerCubes[iterX][iterY][iterZ].hasChildren
+                                && cube.innerCubes[iterX][iterY][iterZ].isValid) {
+                            addresses.add(cube.innerCubes[iterX][iterY][iterZ].address);
+                        } else if (cube.innerCubes[iterX][iterY][iterZ].hasChildren && cube.isValid) {
+                            recursiveAddressStep(cube.innerCubes[iterX][iterY][iterZ], addresses);
+                        }
+                    }
+                }
+            }
+        }
+        return addresses;
+    }
+
     public static void main(String args[]) {
         Cube cube = new Cube();
         // Vector3 points[][] = getPlanePointsFromTile((short) 11);
 
-        cube.splitCube((short) 8, (short) 4, true);
+        cube.splitCube((short) 8, (short) 2, true);
 
         // cube.printCases(getPlanePointsFromTile((short) 8), 0.5, 0.5, 0.5);
 
@@ -408,15 +440,9 @@ public class Cube {
         // Cube lookAtCube = cube.innerCubes[0][0][0];
         System.out.println(lookAtCube.hasChildren);
         System.out.println(lookAtCube.isFullyFilled);
-        for (short iterX = 0; iterX < 3; iterX++) {
-            for (short iterY = 0; iterY < 3; iterY++) {
-                for (short iterZ = 0; iterZ < 3; iterZ++) {
-                    if (lookAtCube.hasChildren) {
-                        System.out.println(lookAtCube.innerCubes[iterX][iterY][iterZ].address + " "
-                                + lookAtCube.innerCubes[iterX][iterY][iterZ].isValid);
-                    }
-                }
-            }
+        ArrayList<String> addr = cube.getEndAddresses();
+        for (String address : addr) {
+            System.out.println(address);
         }
     }
 
