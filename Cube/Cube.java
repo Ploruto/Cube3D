@@ -28,6 +28,7 @@ class Vector3 {
 
 public class Cube {
     private static short SIZE = 3;
+    public static double epsilon = 0.1;
     private short level = 0;
     private Cube innerCubes[][][] = new Cube[SIZE][SIZE][SIZE];
     private boolean hasChildren = false;
@@ -43,7 +44,7 @@ public class Cube {
          * (B−A)×(C−A)=(9,−18,9) . This is the normal vector of the plane, so we can
          * divide it by 9 and get (1,−2,1) . The equation of the plane is thus
          * x−2y+z+k=0 . To get k, substitute any point and solve; we get k=−6. The final
-         * equation of the plane is x−2y+z−6=0 .
+         * equation of the plane is x−2y+z−6=0.
          */
 
         /* calculate VectorAB & AC */
@@ -59,6 +60,9 @@ public class Cube {
         double k = ((pointA.x * x) + (pointA.y * y) + (pointA.z * z)) * -1;
 
         /* solve with x,y,z of PointToCheck */
+        if (Math.abs(
+                ((pointInCubeToCheck.x * x) + (pointInCubeToCheck.y * y) + (pointInCubeToCheck.z * z) + k)) < epsilon)
+            return 0;
 
         return ((pointInCubeToCheck.x * x) + (pointInCubeToCheck.y * y) + (pointInCubeToCheck.z * z) + k);
     }
@@ -370,6 +374,10 @@ public class Cube {
                         }
                     }
                 }
+            } else {
+                this.isValid = keepPositiveDelta;
+                this.hasChildren = false;
+                this.isFullyFilled = false;
             }
 
         } else {
@@ -431,7 +439,7 @@ public class Cube {
         Cube cube = new Cube();
         // Vector3 points[][] = getPlanePointsFromTile((short) 11);
 
-        cube.splitCube((short) 8, (short) 2, true);
+        cube.splitCube((short) 2, (short) 6, false);
 
         // cube.printCases(getPlanePointsFromTile((short) 8), 0.5, 0.5, 0.5);
 
